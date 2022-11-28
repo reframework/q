@@ -1,0 +1,40 @@
+{
+  "compilerOptions": {
+    "forceConsistentCasingInFileNames": true,
+    "allowJs": true,
+    "target": "ESNext",
+    "module": "ES2015",
+    "declaration": true,
+    "noEmitOnError": false,
+    "sourceMap": true,
+    "moduleResolution": "node",
+    "skipLibCheck": true,
+    "strict": true,
+    "noFallthroughCasesInSwitch": true,
+    "suppressImplicitAnyIndexErrors": true,
+    "noImplicitAny": true,
+    "strictFunctionTypes": true,
+    "strictNullChecks": true,
+    "strictPropertyInitialization": true,
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true,
+    "downlevelIteration": true,
+    "incremental": true,
+    "baseUrl": ".",
+    "jsx": "react-jsx",
+    "experimentalDecorators": true,
+    "paths": {
+      "@app/*": ["src/main/*"],
+      "@libraries/*": ["src/@libraries/*"],
+      "@models/*": ["src/@models/*"],
+      "@project/*": ["src/project/*"],
+      "@stores": ["src/@stores/index.ts"],
+      "@ui-system/*": ["src/@ui-system/*"],
+      "@theme/*": ["src/@theme/*"],
+      "@core": ["src/@core/index.ts"]
+    }
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules"]
+}
