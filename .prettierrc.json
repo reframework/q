@@ -2,10 +2,9 @@
   "arrowParens": "always",
   "bracketSpacing": true,
   "endOfLine": "lf",
-  "jsxSingleQuote": false,
-  "printWidth": 85,
+  "printWidth": 80,
   "proseWrap": "always",
-  "semi": false,
+  "semi": true,
   "singleQuote": true,
   "tabWidth": 2,
   "trailingComma": "all"

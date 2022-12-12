@@ -2,7 +2,7 @@
   "compilerOptions": {
     "forceConsistentCasingInFileNames": true,
     "allowJs": true,
-    "target": "ESNext",
+    "target": "ES2015",
     "module": "ES2015",
     "declaration": true,
     "noEmitOnError": false,

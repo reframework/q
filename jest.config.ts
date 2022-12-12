@@ -3,7 +3,7 @@ import type { Config } from '@jest/types';
 // Sync object
 const config: Config.InitialOptions = {
   verbose: true,
-  testEnvironment: 'jest-environment-jsdom',
+  // testEnvironment: 'jest-environment-jsdom',
   automock: false,
   clearMocks: true,
   collectCoverageFrom: ['src/**/*.{ts,tsx}'],
