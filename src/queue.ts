@@ -1,32 +1,23 @@
-export interface IQueue<T = any> {
-  enqueue: (task: T) => void;
-  dequeue: (filterFn: (task: T) => boolean) => void;
-  onDone: (listener: () => void) => void;
-  onProcess: (listener: (task: T, next: () => void) => void) => void;
-}
+import { IQueue } from './queue.interface';
 
 /**
  * The Queue
  */
 export class Queue<T = any> implements IQueue<T> {
   /**
-   * @private
    * The array of Tasks
    */
-  #queue: T[] = [];
+  #entries: T[] = [];
 
   /**
-   * @private
    * Determines if the queue is busy
    * If `#workInProgress` is `true` means the current Task is still running
-   * and next Task cannot be processed until the current one is completed.
+   * and the next Task cannot be processed till the current one is completed.
    */
   #workInProgress = false;
 
   /**
-   * @static
    * Creates a new Queue
-   * Just a factory method for convenience
    */
   static create<T>() {
     return new Queue<T>();
@@ -36,7 +27,7 @@ export class Queue<T = any> implements IQueue<T> {
    * Adds a new Task to the queue
    */
   public enqueue = (task: T) => {
-    this.#queue.push(task);
+    this.#entries.push(task);
     this.#next();
     return this;
   };
@@ -46,25 +37,24 @@ export class Queue<T = any> implements IQueue<T> {
    * Works like Array.prototype.filter
    */
   public dequeue = (filterFn: (task: T) => boolean) => {
-    this.#queue = this.#queue.filter((task) => filterFn(task));
+    this.#entries = this.#entries.filter((task) => filterFn(task));
     return this;
   };
 
   /**
-   * @private
    * Processing the next task in the queue
    */
   #next() {
     if (this.#workInProgress) return;
 
-    if (this.#queue.length === 0) {
+    if (this.#entries.length === 0) {
       /** Queue is empty */
       return this.#onEmpty?.();
     }
 
     /** Begin work */
     this.#workInProgress = true;
-    const nextTask = this.#queue.shift()!;
+    const nextTask = this.#entries.shift()!;
 
     const processTask = () => {
       this.#workInProgress = false;
@@ -76,7 +66,6 @@ export class Queue<T = any> implements IQueue<T> {
     /**
      * There might not be provided `#onProcess`, it does'nt make sense though
      */
-    console.log(typeof this.#onProcess, '\n CALLING PROCES');
     if (typeof this.#onProcess !== 'function') {
       // todo: dev warning: You might forget to define an `onProcessing` callback
       processTask();
@@ -86,14 +75,12 @@ export class Queue<T = any> implements IQueue<T> {
   }
 
   /**
-   * @private
    * A callback which runs each time when Queue is got empty
    */
-  #onEmpty: () => void = () => {};
+  #onEmpty: () => void = () => undefined;
 
   /**
    * Defines an `#onEmpty` callback
-   * See #onEmpty description for more info.
    */
   onEmpty(listener: () => void) {
     this.#onEmpty = listener;
@@ -101,14 +88,12 @@ export class Queue<T = any> implements IQueue<T> {
   }
 
   /**
-   *  @private
    * A callback which runs on each task when processing starts.
    */
   #onProcess: ((task: T, next: () => void) => void) | null = null;
 
   /**
    * Defines an `#onProcess` callback
-   * See #onProcess description for more info.
    */
   onProcess(listener: (task: T, next: () => void) => void) {
     this.#onProcess = listener;
@@ -118,11 +103,10 @@ export class Queue<T = any> implements IQueue<T> {
   /**
    * A callback which runs on each task when processing is finished.
    */
-  #onDone: (task: T) => void = () => {};
+  #onDone: (task: T) => void = () => undefined;
 
   /**
    * Defines an `#onDone` callback
-   * See `#onDone` description for more info.
    */
   onDone(listener: (task: T) => void) {
     this.#onDone = listener;
@@ -141,5 +125,12 @@ export class Queue<T = any> implements IQueue<T> {
   pipe<U>(queue: IQueue<U>) {
     this.#destinationQueue = queue;
     return this;
+  }
+
+  /**
+   * A size of entries
+   */
+  get length() {
+    return this.#entries.length;
   }
 }
