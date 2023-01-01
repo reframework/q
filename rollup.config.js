@@ -31,7 +31,7 @@ export default defineConfig([
   // CommonJS
   {
     input: 'src/index.ts',
-    output: { file: 'lib/qx.js', format: 'cjs', indent: false },
+    output: { file: 'lib/q.js', format: 'cjs', indent: false },
     external,
     plugins: [
       resolve({
@@ -56,7 +56,7 @@ export default defineConfig([
   // ES
   {
     input: 'src/index.ts',
-    output: { file: 'es/qx.js', format: 'es', indent: false },
+    output: { file: 'es/q.js', format: 'es', indent: false },
     external,
     plugins: [
       resolve({
@@ -79,7 +79,7 @@ export default defineConfig([
   // ES for Browsers
   {
     input: 'src/index.ts',
-    output: { file: 'es/qx.mjs', format: 'es', indent: false },
+    output: { file: 'es/q.mjs', format: 'es', indent: false },
     plugins: [
       resolve({
         extensions,
@@ -110,7 +110,7 @@ export default defineConfig([
   {
     input: 'src/index.ts',
     output: {
-      file: 'dist/qx.js',
+      file: 'dist/q.js',
       format: 'umd',
       name: 'qx',
       indent: false,
