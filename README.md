@@ -1,14 +1,21 @@
-# q
+<p align="center">
+  <img width="300" src="https://user-images.githubusercontent.com/49458012/210445030-69feaadd-fe6a-42f1-9828-d7e954daa63e.png">
+</p>
 
-# Introduction
+# Queue
 
-The queue.
+[![forthebadge](http://forthebadge.com/images/badges/built-with-love.svg)](http://forthebadge.com)
+
+## Introduction
+
+
+A simple queue for the front end.
 
 ## Instalation
 
 ```bash
-npm install @refamework/q
-yarn add @refamework/q
+
+npm install --save @refamework/q
 ```
 
 ## Usage
