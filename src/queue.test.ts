@@ -2,11 +2,12 @@ import { Queue } from './queue';
 
 describe('Queue', () => {
   it('should create a new Queue', () => {
+    expect(new Queue()).toBeInstanceOf(Queue);
     expect(Queue.create()).toBeInstanceOf(Queue);
   });
 
-  it('should enqueue a task and run it immediately', () => {
-    const task = { theTask: true };
+  it('should enqueue and run a task immediately', () => {
+    const task = {};
     const onProcess = jest.fn();
     Queue.create<typeof task>().onProcess(onProcess).enqueue(task);
     expect(onProcess).toHaveBeenCalledWith(task, expect.any(Function));
@@ -23,12 +24,12 @@ describe('Queue', () => {
     expect(onEmpty).toHaveBeenCalled();
   });
 
-  it('waits a task to be processed and calls `onDone` and `onEmpty`', () => {
+  it('waits for a task to be processed and calls `onDone` and `onEmpty`', () => {
     const task1 = { theTask: 1 };
     const task2 = { theTask: 2 };
 
     let next = function next() {
-      console.log('Should not be called');
+      return undefined;
     };
 
     const onProcess = jest.fn().mockImplementation((_task, _next) => {
@@ -72,7 +73,9 @@ describe('Queue', () => {
     const task3 = { theTask: 3 };
     const task4 = { theTask: 4 };
 
-    let next = function next() {};
+    let next = function next() {
+      return undefined;
+    };
 
     const onProcess = jest.fn().mockImplementation((_task, _next) => {
       next = _next;
@@ -84,7 +87,7 @@ describe('Queue', () => {
       .enqueue(task2)
       .enqueue(task3)
       .enqueue(task4)
-      .dequeue(({ theTask }) => theTask === 1 || theTask === 3);
+      .filter(({ theTask }) => theTask === 1 || theTask === 3);
 
     // runs four times because four tasks are enqueued
     next();
@@ -97,11 +100,13 @@ describe('Queue', () => {
     expect(onProcess).toHaveBeenNthCalledWith(2, task3, expect.any(Function));
   });
 
-  it.skip('runs pipe', () => {
+  it('runs pipe', () => {
     const task1 = { theTask: 1 };
     const task2 = { theTask: 2 };
 
-    let next = function next() {};
+    let next = function next() {
+      return undefined;
+    };
 
     const onProcess = jest.fn().mockImplementation((_task, _next) => {
       next = _next;
@@ -113,7 +118,6 @@ describe('Queue', () => {
       .enqueue(task1)
       .enqueue(task2);
 
-    // runs four times because four tasks are enqueued
     next();
     next();
 

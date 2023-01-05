@@ -1,1 +1,2 @@
-export { Queue } from './queue'
+export { Queue } from './queue';
+export type { IQueue } from './queue.interface';
