@@ -4,8 +4,8 @@
     "declaration": true,
     "emitDeclarationOnly": true,
     "declarationMap": true,
-    "outDir": "./types"
+    "outDir": "./lib"
   },
   "include": ["src/**/*"],
-  "exclude": ["src/**/*.test.ts"]
+  "exclude": ["**/__tests__", "**/*.test.ts"]
 }

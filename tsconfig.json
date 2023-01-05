@@ -4,7 +4,7 @@
     "allowJs": true,
     "target": "ES2015",
     "module": "ES2015",
-    "declaration": true,
+    "declaration": false,
     "noEmitOnError": false,
     "sourceMap": true,
     "moduleResolution": "node",

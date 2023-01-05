@@ -16,6 +16,8 @@ yarn add @refamework/q
 The queue can be initiated with a static method `create()` instead or `new`
 operator:
 
+https://codesandbox.io/s/inspiring-sanne-yjxrhe?file=/src/App.js
+
 ```ts
 import Queue from '@reframework/queue';
 

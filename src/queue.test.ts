@@ -87,7 +87,7 @@ describe('Queue', () => {
       .enqueue(task2)
       .enqueue(task3)
       .enqueue(task4)
-      .dequeue(({ theTask }) => theTask === 1 || theTask === 3);
+      .filter(({ theTask }) => theTask === 1 || theTask === 3);
 
     // runs four times because four tasks are enqueued
     next();

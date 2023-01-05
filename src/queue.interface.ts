@@ -1,32 +1,35 @@
 export interface IQueue<T = any> {
   /**
-   * Adds a new Task to the queue
+   * Add an element to the end of the queue
    */
   enqueue: (task: T) => IQueue<T>;
   /**
-   * Removes a task by a predicate.
-   * Works like Array.prototype.filter
+   * Removes a task from a front of the queue.
+   * dequeue: () => IQueue<T>;
    */
-  dequeue: (filterFn: (task: T) => boolean) => IQueue<T>;
   /**
-   * returns length
+   * Removes an element by a predicate like Array.prototype.filter
    */
-  length: number;
+  filter: (filterFn: (task: T) => boolean) => IQueue<T>;
   /**
-   * Defines an `#onDone` callback
+   * returns the number of elements in the queue
+   */
+  size: () => number;
+  /**
+   * Provide an `#onDone` callback
    */
   onDone: (listener: () => void) => IQueue<T>;
   /**
-   * Defines an `#onProcess` callback
+   * Provide an `#onProcess` callback
    */
   onProcess: (listener: (task: T, next: () => void) => void) => IQueue<T>;
   /**
-   * Defines an `#onEmpty` callback
+   * Provide an `#onEmpty` callback
    */
   onEmpty: (listener: () => void) => IQueue<T>;
   /**
-   * Defines a destination Queue.
-   * After processing the Task is pushed to the destination queue.
+   * Provide a destination Queue.
+   * The Task goes to the destination queue after processing.
    */
   pipe: <U>(queue: IQueue<U>) => IQueue<T>;
 }

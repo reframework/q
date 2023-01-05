@@ -4,9 +4,6 @@ import { IQueue } from './queue.interface';
  * The Queue
  */
 export class Queue<T = any> implements IQueue<T> {
-  /**
-   * The array of Tasks
-   */
   #entries: T[] = [];
 
   /**
@@ -16,34 +13,26 @@ export class Queue<T = any> implements IQueue<T> {
    */
   #workInProgress = false;
 
-  /**
-   * Creates a new Queue
-   */
   static create<T>() {
     return new Queue<T>();
   }
 
-  /**
-   * Adds a new Task to the queue
-   */
-  public enqueue = (task: T) => {
-    this.#entries.push(task);
+  size() {
+    return this.#entries.length;
+  }
+
+  public enqueue(...tasks: T[]) {
+    this.#entries.push(...tasks);
     this.#next();
     return this;
-  };
+  }
 
-  /**
-   * Removes a task by a predicate.
-   * Works like Array.prototype.filter
-   */
-  public dequeue = (filterFn: (task: T) => boolean) => {
+  // todo tasks cancelling
+  public filter(filterFn: (task: T) => boolean) {
     this.#entries = this.#entries.filter((task) => filterFn(task));
     return this;
-  };
+  }
 
-  /**
-   * Processing the next task in the queue
-   */
   #next() {
     if (this.#workInProgress) return;
 
@@ -70,67 +59,51 @@ export class Queue<T = any> implements IQueue<T> {
       // todo: dev warning: You might forget to define an `onProcessing` callback
       processTask();
     } else {
-      this.#onProcess(nextTask, processTask);
+      try {
+        this.#onProcess(nextTask, processTask);
+      } catch (e) {
+        /**
+         * todo: handle failures
+         */
+        this.#onFailed?.(e, nextTask);
+        this.#workInProgress = false;
+        this.#next();
+      }
     }
   }
 
-  /**
-   * A callback which runs each time when Queue is got empty
-   */
   #onEmpty: () => void = () => undefined;
 
-  /**
-   * Defines an `#onEmpty` callback
-   */
   onEmpty(listener: () => void) {
     this.#onEmpty = listener;
     return this;
   }
 
-  /**
-   * A callback which runs on each task when processing starts.
-   */
   #onProcess: ((task: T, next: () => void) => void) | null = null;
 
-  /**
-   * Defines an `#onProcess` callback
-   */
   onProcess(listener: (task: T, next: () => void) => void) {
     this.#onProcess = listener;
     return this;
   }
 
-  /**
-   * A callback which runs on each task when processing is finished.
-   */
   #onDone: (task: T) => void = () => undefined;
 
-  /**
-   * Defines an `#onDone` callback
-   */
   onDone(listener: (task: T) => void) {
     this.#onDone = listener;
     return this;
   }
 
-  /**
-   * Destination Queue, see `pipe`.
-   */
-  #destinationQueue: IQueue<any> | null = null;
+  #onFailed: (e: unknown, task: T) => void = () => undefined;
 
-  /**
-   * Defines a destination Queue.
-   * After processing the Task is pushed to the destination queue.
-   */
-  pipe<U>(queue: IQueue<U>) {
-    this.#destinationQueue = queue;
+  onFailed(listener: (e: unknown, task: T) => void) {
+    this.#onFailed = listener;
     return this;
   }
 
-  /**
-   * A size of entries
-   */
-  get length() {
-    return this.#entries.length;
+  #destinationQueue: IQueue<any> | null = null;
+
+  pipe<U>(queue: IQueue<U>) {
+    this.#destinationQueue = queue;
+    return this;
   }
 }
