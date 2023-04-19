@@ -1,0 +1,70 @@
+name: Publish NPM Package
+
+on:
+  pull_request:
+    types: [closed]
+    branches:
+      - main
+
+jobs:
+  publish:
+    # remove noop check after adding PR TITLE RULES workflow
+    if: |
+      github.event.pull_request.merged == true && !startsWith(github.event.pull_request.title, 'noop:')
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.RFW_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          registry-url: https://npm.pkg.github.com/
+          scope: '@reframework'
+
+      - name: Extract bump type from PR title
+        id: extract_bump
+        run: |
+          PR_TITLE="${{ github.event.pull_request.title }}"
+          BUMP_REGEX="^(patch|minor|major):"
+          if [[ $PR_TITLE =~ $BUMP_REGEX ]]; then
+            echo "::set-output name=bump_type::${BASH_REMATCH[1]}"
+          else
+            echo "Error: Invalid PR title format. Please start the title with 'patch:', 'minor:' or 'major:'."
+            exit 1
+          fi
+        
+      - name: Bump package version
+        run: |
+          BUMP_TYPE="${{ steps.extract_bump.outputs.bump_type }}"
+          echo "Bump type: $BUMP_TYPE"
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "GitHub Actions"
+          npm version $BUMP_TYPE -m "Bump package version to %s"
+
+      - name: Install Yarn
+        run: npm install -g yarn
+        
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Build
+        run: yarn build
+
+      - name: Publish
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Push changes
+        run: |
+          git push --follow-tags
+        env:
+          # todo: replace with RFW_CODEBUILD_TOKEN
+          GITHUB_TOKEN: ${{ secrets.RFW_TOKEN }}

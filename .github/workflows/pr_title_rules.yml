@@ -1,0 +1,27 @@
+name: PR title rules
+# noop
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+    branches:
+      - 'main'
+
+jobs:
+  check_title:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Checking title prefix
+        run: |
+          PR_TITLE="${{ github.event.pull_request.title }}"
+          REGEX="^(noop|patch|minor|major): "
+          if [[ $PR_TITLE =~ $REGEX ]]; then
+            echo "Title is correct"
+            exit 0
+          else
+            echo "Error: Invalid PR title format. Please start the title with 'patch:', 'minor:' or 'major:'."
+            exit 1
+          fi
