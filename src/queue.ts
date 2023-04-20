@@ -4,106 +4,106 @@ import { IQueue } from './queue.interface';
  * The Queue
  */
 export class Queue<T = any> implements IQueue<T> {
-  #entries: T[] = [];
+  private _entries: T[] = [];
 
   /**
    * Determines if the queue is busy
-   * If `#workInProgress` is `true` means the current Task is still running
+   * If `_workInProgress` is `true` means the current Task is still running
    * and the next Task cannot be processed till the current one is completed.
    */
-  #workInProgress = false;
+  private _workInProgress = false;
 
   static create<T>() {
     return new Queue<T>();
   }
 
   size() {
-    return this.#entries.length;
+    return this._entries.length;
   }
 
   public enqueue(...tasks: T[]) {
-    this.#entries.push(...tasks);
-    this.#next();
+    this._entries.push(...tasks);
+    this._next();
     return this;
   }
 
   // todo tasks cancelling
   public filter(filterFn: (task: T) => boolean) {
-    this.#entries = this.#entries.filter((task) => filterFn(task));
+    this._entries = this._entries.filter((task) => filterFn(task));
     return this;
   }
 
-  #next() {
-    if (this.#workInProgress) return;
+  private _next() {
+    if (this._workInProgress) return;
 
-    if (this.#entries.length === 0) {
+    if (this._entries.length === 0) {
       /** Queue is empty */
-      return this.#onEmpty?.();
+      return this._onEmpty?.();
     }
 
     /** Begin work */
-    this.#workInProgress = true;
-    const nextTask = this.#entries.shift()!;
+    this._workInProgress = true;
+    const nextTask = this._entries.shift()!;
 
     const processTask = () => {
-      this.#workInProgress = false;
-      this.#onDone?.(nextTask);
-      this.#destinationQueue?.enqueue?.(nextTask);
-      this.#next();
+      this._workInProgress = false;
+      this._onDone?.(nextTask);
+      this._destinationQueue?.enqueue?.(nextTask);
+      this._next();
     };
 
     /**
-     * There might not be provided `#onProcess`, it does'nt make sense though
+     * There might not be provided `_onProcess`, it does'nt make sense though
      */
-    if (typeof this.#onProcess !== 'function') {
+    if (typeof this._onProcess !== 'function') {
       // todo: dev warning: You might forget to define an `onProcessing` callback
       processTask();
     } else {
       try {
-        this.#onProcess(nextTask, processTask);
+        this._onProcess(nextTask, processTask);
       } catch (e) {
         /**
          * todo: handle failures
          */
-        this.#onFailed?.(e, nextTask);
-        this.#workInProgress = false;
-        this.#next();
+        this._onFailed?.(e, nextTask);
+        this._workInProgress = false;
+        this._next();
       }
     }
   }
 
-  #onEmpty: () => void = () => undefined;
+  private _onEmpty: () => void = () => undefined;
 
   onEmpty(listener: () => void) {
-    this.#onEmpty = listener;
+    this._onEmpty = listener;
     return this;
   }
 
-  #onProcess: ((task: T, next: () => void) => void) | null = null;
+  private _onProcess: ((task: T, next: () => void) => void) | null = null;
 
   onProcess(listener: (task: T, next: () => void) => void) {
-    this.#onProcess = listener;
+    this._onProcess = listener;
     return this;
   }
 
-  #onDone: (task: T) => void = () => undefined;
+  private _onDone: (task: T) => void = () => undefined;
 
   onDone(listener: (task: T) => void) {
-    this.#onDone = listener;
+    this._onDone = listener;
     return this;
   }
 
-  #onFailed: (e: unknown, task: T) => void = () => undefined;
+  private _onFailed: (e: unknown, task: T) => void = () => undefined;
 
   onFailed(listener: (e: unknown, task: T) => void) {
-    this.#onFailed = listener;
+    this._onFailed = listener;
     return this;
   }
 
-  #destinationQueue: IQueue<any> | null = null;
+  private _destinationQueue: IQueue<any> | null = null;
 
   pipe<U>(queue: IQueue<U>) {
-    this.#destinationQueue = queue;
+    this._destinationQueue = queue;
     return this;
   }
 }

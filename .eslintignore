@@ -6,3 +6,5 @@ coverage
 build
 lib
 types
+rollup.config.js
+babelrc.js

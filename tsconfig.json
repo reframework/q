@@ -1,11 +1,11 @@
 {
   "compilerOptions": {
+    "noEmitOnError": false,
     "forceConsistentCasingInFileNames": true,
     "allowJs": true,
-    "target": "ES2015",
-    "module": "ES2015",
-    "declaration": false,
-    "noEmitOnError": false,
+    "target": "es5",
+    "module": "esnext",
+    "declaration": true,
     "sourceMap": true,
     "moduleResolution": "node",
     "skipLibCheck": true,
@@ -20,8 +20,9 @@
     "allowSyntheticDefaultImports": true,
     "downlevelIteration": true,
     "incremental": true,
+    "declarationMap": true,
     "baseUrl": ".",
   },
-  "include": ["src/**/*"],
+  "include": ["src", "types"],
   "exclude": ["node_modules"]
 }

@@ -1,59 +1,77 @@
-import { defineConfig } from 'rollup';
-import resolve from '@rollup/plugin-node-resolve';
-import babel from '@rollup/plugin-babel';
-import replace from '@rollup/plugin-replace';
-import typescript from 'rollup-plugin-typescript2';
-import { terser } from 'rollup-plugin-terser';
+const { defineConfig } = require('rollup');
+const babel = require('@rollup/plugin-babel');
+const typescript = require('rollup-plugin-typescript2');
+const resolve = require('@rollup/plugin-node-resolve');
+const commonjs = require('@rollup/plugin-commonjs');
+const { terser } = require('rollup-plugin-terser');
+const sourcemaps = require('rollup-plugin-sourcemaps');
+const { visualizer } = require('rollup-plugin-visualizer');
+const strip = require('@rollup/plugin-strip');
 
-import { createRequire } from 'node:module';
-const require = createRequire(import.meta.url);
-const pkg = require('./package.json');
+const extensions = ['.js', '.jsx', '.ts', '.tsx'];
+const isProduction = process.env.NODE_ENV === 'production';
 
-const extensions = ['.ts'];
-const noDeclarationFiles = {
-  compilerOptions: {
-    declaration: false,
-  },
-  exclude: ['**/__tests__', '**/*.test.ts'],
-};
+const plugins = [
+  resolve({ extensions }),
+  commonjs(),
+  typescript({
+    tsconfigOverride: {
+      exclude: [
+        '**/__tests__',
+        '**/*.test.ts',
+        '**/*.test.tsx',
+        '**/*.stories.tsx',
+      ],
+    },
+  }),
+  babel({
+    exclude: 'node_modules/**',
+    extensions,
+    plugins: ['@babel/plugin-transform-runtime'],
+    babelHelpers: 'runtime',
+    skipPreflightCheck: true,
+  }),
+  sourcemaps(),
+  visualizer({
+    filename: './statistics.html',
+    title: 'Bundle Size Stats',
+  }),
+];
 
-const babelRuntimeVersion = pkg.dependencies['@babel/runtime'].replace(
-  /^[^0-9]*/,
-  '',
-);
-
-const external = [
-  ...Object.keys(pkg.dependencies || {}),
-  ...Object.keys(pkg.peerDependencies || {}),
-].map((name) => RegExp(`^${name}($|/)`));
-
-export default defineConfig([
+const output = [
   {
-    input: 'src/index.ts',
-    output: { file: 'lib/index.js', format: 'cjs', indent: false },
-    plugins: [
-      resolve({
-        extensions,
-      }),
-      typescript({ tsconfigOverride: noDeclarationFiles }),
-      babel({
-        extensions,
-        exclude: 'node_modules/**',
-        plugins: [],
-        skipPreflightCheck: true,
-        babelHelpers: 'bundled',
-      }),
-      replace({
-        preventAssignment: true,
-        'process.env.NODE_ENV': JSON.stringify('production'),
-      }),
-      terser({
-        compress: {
-          pure_getters: true,
-          unsafe: true,
-          unsafe_comps: true,
-        },
-      }),
-    ],
+    dir: 'lib',
+    format: 'cjs',
+    sourcemap: isProduction,
+    exports: 'named',
   },
-]);
+  {
+    dir: 'lib/esm',
+    format: 'esm',
+    sourcemap: isProduction,
+    exports: 'named',
+  },
+];
+
+const productionPlugins = [
+  strip({
+    functions: ['console.log'],
+    labels: ['DEBUG'],
+    sourceMap: true,
+  }),
+  terser({
+    compress: {
+      drop_console: true,
+      passes: 2,
+    },
+    output: {
+      comments: false,
+    },
+  }),
+];
+
+module.exports = defineConfig({
+  input: 'src/index.ts',
+  output,
+  plugins: [...plugins, ...productionPlugins],
+});

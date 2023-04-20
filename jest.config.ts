@@ -1,9 +1,7 @@
 import type { Config } from '@jest/types';
 
-// Sync object
 const config: Config.InitialOptions = {
   verbose: true,
-  // testEnvironment: 'jest-environment-jsdom',
   automock: false,
   clearMocks: true,
   collectCoverageFrom: ['src/**/*.{ts,tsx}'],
@@ -21,7 +19,6 @@ const config: Config.InitialOptions = {
   ],
   transform: {
     '^.+\\.(js|jsx|ts|tsx)?$': 'ts-jest',
-    '^.+\\.js$': 'babel-jest',
   },
   testMatch: ['<rootDir>/**/*.test.(js|jsx|ts|tsx)'],
   transformIgnorePatterns: ['[/\\\\]node_modules[/\\\\].+\\.(js|jsx)$'],
@@ -35,7 +32,6 @@ const config: Config.InitialOptions = {
     '^@components(.*)$': '<rootDir>/src/components$1',
     '^@wip(.*)$': '<rootDir>/src/components-wip$1',
   },
-  setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
 };
 
 export default config;
