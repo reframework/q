@@ -44,7 +44,7 @@
   ],
   "license": "MIT",
   "main": "lib/index.js",
-  "name": "@reframework/queue",
+  "name": "@reframework/q",
   "publishConfig": {
     "registry": "https://npm.pkg.github.com/"
   },
@@ -62,5 +62,5 @@
   },
   "type": "commonjs",
   "types": "lib/index.d.ts",
-  "version": "0.0.1"
+  "version": "0.0.4"
 }
